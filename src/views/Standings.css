@@ -1,0 +1,116 @@
+.standings-view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.phase-selector {
+    display: flex;
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    width: fit-content;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.phase-btn {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.phase-btn:hover {
+    color: var(--text-main);
+}
+
+.phase-btn.active {
+    background: var(--primary);
+    color: #000;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.table-container {
+    overflow-x: auto;
+    padding: 1rem;
+}
+
+.standings-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.standings-table th {
+    padding: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 700;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.standings-table td {
+    padding: 1.25rem 1rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.team-col {
+    width: 30%;
+    font-weight: 600;
+}
+
+.pos {
+    width: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.pts-col {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+}
+
+.our-row {
+    background: rgba(0, 230, 118, 0.05);
+}
+
+.our-row td {
+    border-bottom: 1px solid var(--primary-glow);
+}
+
+.our-row .team-col {
+    color: var(--primary);
+}
+
+/* Hover effects */
+.standings-table tr:hover:not(thead tr) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 768px) {
+
+    .standings-table th:nth-child(n+3):nth-child(-n+8),
+    .standings-table td:nth-child(n+3):nth-child(-n+8) {
+        display: none;
+    }
+}

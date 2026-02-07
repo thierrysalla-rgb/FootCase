@@ -1,0 +1,117 @@
+.stats-view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.stats-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stats-header h3 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.stats-card {
+    padding: 1.5rem;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+}
+
+.stats-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.stats-item .rank {
+    width: 24px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.stats-item .name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.stats-item .value {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.empty-txt {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem 0;
+}
+
+.evolution-chart-container {
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.chart-wrapper {
+    width: 100%;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-chart {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* Custom Tooltip Styling */
+.recharts-tooltip-wrapper {
+    outline: none;
+}
+
+.recharts-default-legend {
+    margin-top: 1.5rem !important;
+}
+
+.recharts-legend-item-text {
+    color: var(--text-dim) !important;
+    font-size: 13px;
+    font-weight: 500;
+}

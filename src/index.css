@@ -1,0 +1,10 @@
+@import './styles/theme.css';
+
+:root {
+  /* Vite defaults override if needed */
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+}
