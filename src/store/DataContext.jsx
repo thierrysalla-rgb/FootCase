@@ -27,6 +27,12 @@ export const DataProvider = ({ children }) => {
     // Initial Fetch from Supabase
     useEffect(() => {
         const fetchData = async () => {
+            if (!supabase) {
+                console.error("Supabase client not initialized.");
+                setLoading(false);
+                return;
+            }
+
             try {
                 const [p, m, l, s, t] = await Promise.all([
                     supabase.from('players').select('*'),
@@ -35,6 +41,11 @@ export const DataProvider = ({ children }) => {
                     supabase.from('staff').select('*'),
                     supabase.from('teams').select('*')
                 ]);
+
+                // Log any errors from Supabase responses
+                [p, m, l, s, t].forEach((res, i) => {
+                    if (res.error) console.error(`Supabase error (query ${i}):`, res.error);
+                });
 
                 if (p.data) setPlayers(p.data);
                 if (m.data) setMatches(m.data.map(match => ({
@@ -50,10 +61,14 @@ export const DataProvider = ({ children }) => {
                 if (s.data) setStaff(s.data);
                 if (t.data) setTeams(t.data.map(team => team.name));
             } catch (err) {
-                console.error("Error fetching data from Supabase:", err);
-                // Fallback to localStorage if offline
-                const savedPlayers = localStorage.getItem('u11_players');
-                if (savedPlayers) setPlayers(JSON.parse(savedPlayers));
+                console.error("Critical error fetching data from Supabase:", err);
+                // Fallback to localStorage if offline or error
+                try {
+                    const savedPlayers = localStorage.getItem('u11_players');
+                    if (savedPlayers) setPlayers(JSON.parse(savedPlayers));
+                } catch (e) {
+                    console.error("LocalStorage fallback failed:", e);
+                }
             } finally {
                 setLoading(false);
             }
