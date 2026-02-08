@@ -1,21 +1,8 @@
-// Build Trigger: 2026-02-08 01:21
+// Final Clean Build Trigger: 2026-02-08 01:30
 import React from 'react';
-import {
-    Trophy,
-    Users,
-    Calendar,
-    BarChart3,
-    LayoutDashboard,
-    TrendingUp,
-    Shield,
-    Settings,
-    BadgeCheck,
-    LogOut,
-    LogIn
-} from 'lucide-react';
+import { Trophy, Users, Calendar, BarChart3, LayoutDashboard, Shield, Settings, BadgeCheck, LogOut, LogIn } from 'lucide-react';
 import './Sidebar.css';
 import { useData } from '../../store/DataContext';
-
 
 const Sidebar = ({ activeView, setView }) => {
     const { user, isAdmin, logout } = useData();
