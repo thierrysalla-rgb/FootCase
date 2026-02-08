@@ -205,6 +205,14 @@ export const DataProvider = ({ children }) => {
         await supabase.from('league_matches').delete().eq('id', id);
     };
 
+    const restoreAllData = (data) => {
+        if (data.players) setPlayers(data.players);
+        if (data.matches) setMatches(data.matches);
+        if (data.leagueMatches) setLeagueMatches(data.leagueMatches);
+        if (data.staff) setStaff(data.staff);
+        if (data.teams) setTeams(data.teams);
+    };
+
     const login = async (email, password) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
