@@ -110,3 +110,53 @@
     font-size: 0.75rem;
     color: var(--text-dim);
 }
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0 1rem;
+        padding-left: 3.5rem;
+        /* Space for hamburger menu */
+        height: 60px;
+    }
+
+    .header-left h2 {
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    .search-bar {
+        display: none;
+        /* Hide search bar on mobile to save space */
+    }
+
+    .user-profile {
+        padding-left: 0.75rem;
+    }
+
+    .user-info {
+        display: none;
+        /* Hide user name/role on mobile */
+    }
+
+    .header-right {
+        gap: 0.5rem;
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}

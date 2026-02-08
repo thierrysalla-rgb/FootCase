@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récupération des données locales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        h1 {
+            color: #00d4ff;
+        }
+
+        .section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+        }
+
+        button {
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #00a8cc;
+        }
+
+        pre {
+            background: #0f1419;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        .success {
+            color: #4caf50;
+        }
+
+        .warning {
+            color: #ff9800;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔧 Récupération des données FootCase</h1>
+
+    <div class="section">
+        <h2>Étape 1 : Vérifier les données</h2>
+        <button onclick="checkData()">Vérifier le localStorage</button>
+        <div id="check-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>Étape 2 : Exporter les données</h2>
+        <button onclick="exportData()">Télécharger les données (JSON)</button>
+        <p class="warning">⚠️ Sauvegardez ce fichier avant de continuer !</p>
+    </div>
+
+    <div class="section">
+        <h2>Étape 3 : Copier vers Supabase</h2>
+        <p>Une fois vos données exportées, vous pourrez les importer manuellement dans votre base Supabase.</p>
+        <button onclick="showSQL()">Générer le SQL d'import</button>
+        <div id="sql-result"></div>
+    </div>
+
+    <script>
+        function checkData() {
+            const result = document.getElementById('check-result');
+            const players = localStorage.getItem('u11_players');
+            const matches = localStorage.getItem('u11_matches');
+            const staff = localStorage.getItem('u11_staff');
+
+            if (!players && !matches && !staff) {
+                result.innerHTML = '<p class="warning">❌ Aucune donnée trouvée dans le localStorage</p>';
+                return;
+            }
+
+            let html = '<p class="success">✅ Données trouvées !</p><ul>';
+            if (players) {
+                const p = JSON.parse(players);
+                html += `<li>Joueurs : ${p.length} entrées</li>`;
+            }
+            if (matches) {
+                const m = JSON.parse(matches);
+                html += `<li>Matchs : ${m.length} entrées</li>`;
+            }
+            if (staff) {
+                const s = JSON.parse(staff);
+                html += `<li>Staff : ${s.length} entrées</li>`;
+            }
+            html += '</ul>';
+            result.innerHTML = html;
+        }
+
+        function exportData() {
+            const data = {
+                players: JSON.parse(localStorage.getItem('u11_players') || '[]'),
+                matches: JSON.parse(localStorage.getItem('u11_matches') || '[]'),
+                staff: JSON.parse(localStorage.getItem('u11_staff') || '[]'),
+                leagueMatches: JSON.parse(localStorage.getItem('u11_leagueMatches') || '[]'),
+                teams: JSON.parse(localStorage.getItem('u11_teams') || '["CASE2"]')
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'footcase-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+        }
+
+        function showSQL() {
+            const result = document.getElementById('sql-result');
+            const players = JSON.parse(localStorage.getItem('u11_players') || '[]');
+            const matches = JSON.parse(localStorage.getItem('u11_matches') || '[]');
+            const staff = JSON.parse(localStorage.getItem('u11_staff') || '[]');
+
+            let sql = '-- Import des données FootCase\n\n';
+
+            // Players
+            if (players.length > 0) {
+                sql += '-- Joueurs\n';
+                players.forEach(p => {
+                    sql += `INSERT INTO players (id, name, number, position, photo, goals, assists) VALUES (${p.id}, '${p.name.replace(/'/g, "''")}', '${p.number || ''}', '${p.position || ''}', '${p.photo || ''}', ${p.goals || 0}, ${p.assists || 0});\n`;
+                });
+                sql += '\n';
+            }
+
+            // Staff
+            if (staff.length > 0) {
+                sql += '-- Staff\n';
+                staff.forEach(s => {
+                    sql += `INSERT INTO staff (id, name, role, photo) VALUES (${s.id}, '${s.name.replace(/'/g, "''")}', '${s.role || ''}', '${s.photo || ''}');\n`;
+                });
+                sql += '\n';
+            }
+
+            // Matches
+            if (matches.length > 0) {
+                sql += '-- Matchs\n';
+                matches.forEach(m => {
+                    const lineup = JSON.stringify(m.lineup || []).replace(/'/g, "''");
+                    const bench = JSON.stringify(m.bench || []).replace(/'/g, "''");
+                    const events = JSON.stringify(m.events || []).replace(/'/g, "''");
+                    sql += `INSERT INTO matches (id, opponent, date, time, location, type, phase, status, our_score, opponent_score, lineup, bench, events) VALUES (${m.id}, '${m.opponent.replace(/'/g, "''")}', '${m.date}', '${m.time || ''}', '${m.location || ''}', '${m.type || ''}', '${m.phase || ''}', '${m.status || 'planned'}', ${m.ourScore || 0}, ${m.opponentScore || 0}, '${lineup}', '${bench}', '${events}');\n`;
+                });
+            }
+
+            result.innerHTML = '<h3>SQL généré :</h3><pre>' + sql + '</pre><button onclick="copySQL()">Copier le SQL</button>';
+            window.generatedSQL = sql;
+        }
+
+        function copySQL() {
+            navigator.clipboard.writeText(window.generatedSQL);
+            alert('SQL copié dans le presse-papier !');
+        }
+    </script>
+</body>
+
+</html>

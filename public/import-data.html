@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import des données vers Supabase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        h1 {
+            color: #00d4ff;
+        }
+
+        .section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+        }
+
+        button {
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #00a8cc;
+        }
+
+        pre {
+            background: #0f1419;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            max-height: 500px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .success {
+            color: #4caf50;
+        }
+
+        .warning {
+            color: #ff9800;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            background: #0f1419;
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #eee;
+        }
+
+        .info {
+            background: #1e3a5f;
+            padding: 15px;
+            border-left: 4px solid #00d4ff;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📥 Import des données FootCase vers Supabase</h1>
+
+    <div class="info">
+        <strong>Instructions :</strong>
+        <ol>
+            <li>Sélectionnez votre fichier backup JSON</li>
+            <li>Cliquez sur "Générer le SQL"</li>
+            <li>Copiez le code SQL généré</li>
+            <li>Allez dans Supabase → SQL Editor</li>
+            <li>Collez et exécutez le code SQL</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Étape 1 : Charger votre fichier backup</h2>
+        <input type="file" id="fileInput" accept=".json" />
+        <button onclick="loadFile()">Charger le fichier</button>
+        <div id="file-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>Étape 2 : Générer le SQL d'import</h2>
+        <button onclick="generateSQL()" id="generateBtn" disabled>Générer le SQL</button>
+        <div id="sql-output"></div>
+    </div>
+
+    <script>
+        let backupData = null;
+
+        function loadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Veuillez sélectionner un fichier');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    backupData = JSON.parse(e.target.result);
+                    const info = document.getElementById('file-info');
+
+                    let html = '<p class="success">✅ Fichier chargé avec succès !</p><ul>';
+                    html += `<li>Joueurs : ${backupData.players?.length || 0}</li>`;
+                    html += `<li>Matchs : ${backupData.matches?.length || 0}</li>`;
+                    html += `<li>Staff : ${backupData.staff?.length || 0}</li>`;
+                    html += `<li>Matchs de championnat : ${backupData.leagueMatches?.length || 0}</li>`;
+                    html += `<li>Équipes : ${backupData.teams?.length || 0}</li>`;
+                    html += '</ul>';
+
+                    info.innerHTML = html;
+                    document.getElementById('generateBtn').disabled = false;
+                } catch (err) {
+                    alert('Erreur lors de la lecture du fichier : ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function escapeSQL(str) {
+            if (!str) return '';
+            return str.toString().replace(/'/g, "''");
+        }
+
+        function generateSQL() {
+            if (!backupData) {
+                alert('Veuillez d\'abord charger un fichier');
+                return;
+            }
+
+            let sql = '-- Import automatique des données FootCase\n';
+            sql += '-- Généré le ' + new Date().toLocaleString('fr-FR') + '\n\n';
+
+            // Teams
+            if (backupData.teams && backupData.teams.length > 0) {
+                sql += '-- Équipes\n';
+                backupData.teams.forEach(team => {
+                    sql += `INSERT INTO teams (name) VALUES ('${escapeSQL(team)}') ON CONFLICT (name) DO NOTHING;\n`;
+                });
+                sql += '\n';
+            }
+
+            // Players
+            if (backupData.players && backupData.players.length > 0) {
+                sql += '-- Joueurs\n';
+                backupData.players.forEach(p => {
+                    sql += `INSERT INTO players (id, name, number, position, photo, goals, assists) VALUES `;
+                    sql += `(${p.id}, '${escapeSQL(p.name)}', '${escapeSQL(p.number)}', '${escapeSQL(p.position)}', `;
+                    sql += `'${escapeSQL(p.photo)}', ${p.goals || 0}, ${p.assists || 0});\n`;
+                });
+                sql += '\n';
+            }
+
+            // Staff
+            if (backupData.staff && backupData.staff.length > 0) {
+                sql += '-- Staff\n';
+                backupData.staff.forEach(s => {
+                    sql += `INSERT INTO staff (id, name, role, photo) VALUES `;
+                    sql += `(${s.id}, '${escapeSQL(s.name)}', '${escapeSQL(s.role)}', '${escapeSQL(s.photo)}');\n`;
+                });
+                sql += '\n';
+            }
+
+            // Matches
+            if (backupData.matches && backupData.matches.length > 0) {
+                sql += '-- Matchs\n';
+                backupData.matches.forEach(m => {
+                    const lineup = JSON.stringify(m.lineup || []).replace(/'/g, "''");
+                    const bench = JSON.stringify(m.bench || []).replace(/'/g, "''");
+                    const events = JSON.stringify(m.events || []).replace(/'/g, "''");
+
+                    sql += `INSERT INTO matches (id, opponent, date, time, location, type, phase, status, our_score, opponent_score, lineup, bench, events) VALUES `;
+                    sql += `(${m.id}, '${escapeSQL(m.opponent)}', '${m.date}', '${escapeSQL(m.time)}', `;
+                    sql += `'${escapeSQL(m.location)}', '${escapeSQL(m.type)}', '${escapeSQL(m.phase)}', `;
+                    sql += `'${m.status || 'planned'}', ${m.ourScore || m.our_score || 0}, ${m.opponentScore || m.opponent_score || 0}, `;
+                    sql += `'${lineup}'::jsonb, '${bench}'::jsonb, '${events}'::jsonb);\n`;
+                });
+                sql += '\n';
+            }
+
+            // League Matches
+            if (backupData.leagueMatches && backupData.leagueMatches.length > 0) {
+                sql += '-- Matchs de championnat\n';
+                backupData.leagueMatches.forEach(lm => {
+                    sql += `INSERT INTO league_matches (id, home, away, home_score, away_score, phase) VALUES `;
+                    sql += `(${lm.id}, '${escapeSQL(lm.home)}', '${escapeSQL(lm.away)}', `;
+                    sql += `${lm.homeScore || lm.home_score || 0}, ${lm.awayScore || lm.away_score || 0}, '${escapeSQL(lm.phase)}');\n`;
+                });
+                sql += '\n';
+            }
+
+            const output = document.getElementById('sql-output');
+            output.innerHTML = `
+                <h3 class="success">✅ SQL généré avec succès !</h3>
+                <p class="warning">⚠️ Copiez ce code et exécutez-le dans Supabase SQL Editor</p>
+                <button onclick="copySQL()">📋 Copier le SQL</button>
+                <button onclick="downloadSQL()">💾 Télécharger le SQL</button>
+                <pre id="sqlCode">${sql}</pre>
+            `;
+
+            window.generatedSQL = sql;
+        }
+
+        function copySQL() {
+            navigator.clipboard.writeText(window.generatedSQL);
+            alert('✅ SQL copié dans le presse-papier !');
+        }
+
+        function downloadSQL() {
+            const blob = new Blob([window.generatedSQL], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'footcase-import-' + new Date().toISOString().split('T')[0] + '.sql';
+            a.click();
+        }
+    </script>
+</body>
+
+</html>

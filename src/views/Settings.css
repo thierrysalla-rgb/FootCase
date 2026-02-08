@@ -101,3 +101,21 @@
     font-size: 0.9rem;
     color: var(--text-muted);
 }
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-card {
+        padding: 1.5rem;
+    }
+
+    .settings-info {
+        flex-direction: column;
+    }
+}

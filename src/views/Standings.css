@@ -107,10 +107,44 @@
     background: rgba(255, 255, 255, 0.03);
 }
 
-@media (max-width: 768px) {
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
 
+@media (max-width: 768px) {
+    .table-container {
+        padding: 0;
+        margin: 0 -1rem;
+        /* Negative margin to let table touch edges */
+    }
+
+    .standings-table th,
+    .standings-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .team-col {
+        width: auto;
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Hide less important columns on mobile */
     .standings-table th:nth-child(n+3):nth-child(-n+8),
     .standings-table td:nth-child(n+3):nth-child(-n+8) {
         display: none;
+    }
+
+    .phase-selector {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .phase-btn {
+        flex: 1;
+        white-space: nowrap;
     }
 }

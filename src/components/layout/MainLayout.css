@@ -37,3 +37,26 @@
 .main-content::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
 }
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .content-area {
+        width: 100%;
+        margin-left: 0;
+        height: 100dvh;
+        /* dynamic viewport height for mobile browsers */
+    }
+
+    .main-content {
+        padding: 1rem;
+        padding-bottom: 2rem;
+        /* Add extra padding for mobile scrolling */
+    }
+}

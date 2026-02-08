@@ -430,3 +430,56 @@
         transform: translateY(0);
     }
 }
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .matches-list {
+        grid-template-columns: 1fr;
+    }
+
+    .match-card {
+        padding: 1rem;
+    }
+
+    .match-main .score {
+        font-size: 1.25rem;
+        padding: 0.25rem 0.5rem;
+        min-width: 60px;
+    }
+
+    .match-setup-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pitch {
+        height: 300px;
+    }
+
+    .player-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .match-scoreboard-horizontal {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .sb-divider {
+        display: none;
+    }
+
+    .sb-team {
+        width: 100%;
+        justify-content: space-between !important;
+    }
+
+    .finish-btn {
+        width: 100%;
+    }
+}

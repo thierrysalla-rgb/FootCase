@@ -25,6 +25,18 @@
   --header-height: 70px;
   --radius-lg: 16px;
   --radius-md: 12px;
+
+  /* Responsive Breakpoints */
+  --mobile: 480px;
+  --tablet: 768px;
+  --desktop: 1024px;
+
+  /* Responsive Font Sizes */
+  --font-xs: clamp(0.75rem, 2vw, 0.875rem);
+  --font-sm: clamp(0.875rem, 2.5vw, 1rem);
+  --font-base: clamp(1rem, 3vw, 1.125rem);
+  --font-lg: clamp(1.125rem, 3.5vw, 1.25rem);
+  --font-xl: clamp(1.25rem, 4vw, 1.5rem);
 }
 
 * {
@@ -128,4 +140,39 @@ option {
 /* Remove default styles that might override */
 select::-ms-expand {
   display: none;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN - Mobile First
+   ======================================== */
+
+/* Tablet and below */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+    --header-height: 60px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile only */
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
 }
