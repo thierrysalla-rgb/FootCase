@@ -113,15 +113,20 @@ const Settings = () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
                 const data = JSON.parse(event.target.result);
                 if (window.confirm("Attention : Restaurer une sauvegarde va écraser vos données actuelles. Continuer ?")) {
-                    restoreAllData(data);
-                    alert("Sauvegarde restaurée avec succès !");
+                    const result = await restoreAllData(data);
+                    if (result.success) {
+                        alert("✅ Sauvegarde restaurée avec succès et synchronisée dans le cloud !");
+                    } else {
+                        alert("❌ Erreur lors de la restauration. Vérifiez la console.");
+                    }
                 }
             } catch (err) {
-                alert("Erreur lors de la lecture du fichier de sauvegarde.");
+                alert("❌ Erreur lors de la lecture du fichier de sauvegarde.");
+                console.error(err);
             }
         };
         reader.readAsText(file);

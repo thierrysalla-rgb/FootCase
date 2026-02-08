@@ -205,12 +205,83 @@ export const DataProvider = ({ children }) => {
         await supabase.from('league_matches').delete().eq('id', id);
     };
 
-    const restoreAllData = (data) => {
-        if (data.players) setPlayers(data.players);
-        if (data.matches) setMatches(data.matches);
-        if (data.leagueMatches) setLeagueMatches(data.leagueMatches);
-        if (data.staff) setStaff(data.staff);
-        if (data.teams) setTeams(data.teams);
+    const restoreAllData = async (data) => {
+        try {
+            // 1. Delete all existing data from Supabase
+            await Promise.all([
+                supabase.from('matches').delete().neq('id', 0),
+                supabase.from('league_matches').delete().neq('id', 0),
+                supabase.from('players').delete().neq('id', 0),
+                supabase.from('staff').delete().neq('id', 0),
+                supabase.from('teams').delete().neq('name', '')
+            ]);
+
+            // 2. Insert new data into Supabase
+            const insertPromises = [];
+
+            if (data.teams?.length) {
+                insertPromises.push(
+                    supabase.from('teams').insert(data.teams.map(name => ({ name })))
+                );
+            }
+
+            if (data.players?.length) {
+                insertPromises.push(supabase.from('players').insert(data.players));
+            }
+
+            if (data.staff?.length) {
+                insertPromises.push(supabase.from('staff').insert(data.staff));
+            }
+
+            if (data.matches?.length) {
+                const dbMatches = data.matches.map(m => {
+                    // Remove camelCase fields that don't exist in Supabase schema
+                    const { ourScore, opponentScore, ...rest } = m;
+
+                    return {
+                        ...rest,
+                        our_score: m.ourScore || m.our_score || 0,
+                        opponent_score: m.opponentScore || m.opponent_score || 0,
+                        lineup: m.lineup || [],
+                        bench: m.bench || [],
+                        events: m.events || [],
+                        status: m.status || 'planned',
+                        location: m.location || '',
+                        phase: m.phase || ''
+                    };
+                });
+                insertPromises.push(supabase.from('matches').insert(dbMatches));
+            }
+
+            if (data.leagueMatches?.length) {
+                const dbLeagueMatches = data.leagueMatches.map(lm => {
+                    // Remove camelCase fields that don't exist in Supabase schema
+                    const { homeScore, awayScore, ...rest } = lm;
+
+                    return {
+                        ...rest,
+                        home_score: lm.homeScore || lm.home_score || 0,
+                        away_score: lm.awayScore || lm.away_score || 0,
+                        phase: lm.phase || ''
+                    };
+                });
+                insertPromises.push(supabase.from('league_matches').insert(dbLeagueMatches));
+            }
+
+            await Promise.all(insertPromises);
+
+            // 3. Update local state
+            if (data.players) setPlayers(data.players);
+            if (data.matches) setMatches(data.matches);
+            if (data.leagueMatches) setLeagueMatches(data.leagueMatches);
+            if (data.staff) setStaff(data.staff);
+            if (data.teams) setTeams(data.teams);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Erreur lors de la restauration:', error);
+            return { success: false, error };
+        }
     };
 
     const login = async (email, password) => {
