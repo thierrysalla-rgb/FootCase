@@ -10,8 +10,7 @@ import {
     Settings,
     BadgeCheck,
     LogOut,
-    LogIn,
-    Shield
+    LogIn
 } from 'lucide-react';
 import './Sidebar.css';
 import { useData } from '../../store/DataContext';
