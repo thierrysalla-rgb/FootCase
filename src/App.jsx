@@ -13,7 +13,7 @@ import { useData } from './store/DataContext';
 
 
 function App() {
-  const { user, login, logout, isAdmin } = useData();
+  const { user, login, logout, isAdmin, loading } = useData();
   const [activeView, setActiveView] = useState('dashboard');
 
   // Rediriger vers le dashboard une fois connecté
@@ -22,6 +22,15 @@ function App() {
       setActiveView('dashboard');
     }
   }, [user, activeView]);
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loader"></div>
+        <p>Chargement du FootCase...</p>
+      </div>
+    );
+  }
 
 
   const renderView = () => {
