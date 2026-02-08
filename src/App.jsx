@@ -1,3 +1,4 @@
+// Version 1.0.1 - Final Cloud Sync
 import React, { useState, useEffect } from 'react';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './views/Dashboard';
